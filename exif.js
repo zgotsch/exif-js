@@ -337,7 +337,7 @@ function getImageData(img, callback) {
         }
 
         if (callback) {
-            callback.call(exifData, iptcData);
+            callback(exifData, iptcData);
         }
     }
 
@@ -737,52 +737,10 @@ function getData(img, callback) {
         getImageData(img, callback);
     } else {
         if (callback) {
-            callback.call(
-                _urlToExifData[img.src],
-                _urlToIptcData[img.src]
-            );
+            callback(_urlToExifData[img.src], _urlToIptcData[img.src]);
         }
     }
     return true;
-}
-
-function getTag(img, tag) {
-    if (!imageHasData(img)) return;
-    return _urlToExifData[img.src][tag];
-}
-
-function getAllTags(img) {
-    if (!imageHasData(img)) return {};
-    var a,
-        data = _urlToExifData[img.src],
-        tags = {};
-    for (a in data) {
-        if (data.hasOwnProperty(a)) {
-            tags[a] = data[a];
-        }
-    }
-    return tags;
-}
-
-function pretty(img) {
-    if (!imageHasData(img)) return "";
-    var a,
-        data = _urlToExifData[img.src],
-        strPretty = "";
-    for (a in data) {
-        if (data.hasOwnProperty(a)) {
-            if (typeof data[a] == "object") {
-                if (data[a] instanceof Number) {
-                    strPretty += a + " : " + data[a] + " [" + data[a].numerator + "/" + data[a].denominator + "]\r\n";
-                } else {
-                    strPretty += a + " : [" + data[a].length + " values]\r\n";
-                }
-            } else {
-                strPretty += a + " : " + data[a] + "\r\n";
-            }
-        }
-    }
-    return strPretty;
 }
 
 function readFromBinaryFile(file) {
@@ -794,9 +752,6 @@ if (!window.module) {
 }
 module.exports = {
     readFromBinaryFile : readFromBinaryFile,
-    pretty : pretty,
-    getTag : getTag,
-    getAllTags : getAllTags,
     getData : getData,
 
     Tags : ExifTags,
