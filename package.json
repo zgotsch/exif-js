@@ -1,0 +1,22 @@
+{
+  "name": "exif-js",
+  "version": "0.0.0",
+  "description": "Exif reading client-side",
+  "main": "exif.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zgotsch/exif-js.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zgotsch/exif-js/issues"
+  },
+  "homepage": "https://github.com/zgotsch/exif-js"
+}
