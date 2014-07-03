@@ -1,5 +1,8 @@
 var debug = false;
 
+var _urlToExifData = {};
+var _urlToIptcData = {};
+
 var ExifTags = {
 
     // version tags
@@ -293,7 +296,7 @@ function addEvent(element, event, handler) {
 }
 
 function imageHasData(img) {
-    return !!(img.exifdata);
+    return img.src in _urlToExifData;
 }
 
 
@@ -324,12 +327,17 @@ function objectURLToBlob(url, callback) {
 
 function getImageData(img, callback) {
     function handleBinaryFile(binFile) {
-        var data = findEXIFinJPEG(binFile);
-        var iptcdata = findIPTCinJPEG(binFile);
-        img.exifdata = data || {};
-        img.iptcdata = iptcdata || {};
+        var exifData = findEXIFinJPEG(binFile);
+        var iptcData = findIPTCinJPEG(binFile);
+
+        var id = img.src;
+        if (id) {
+            _urlToExifData[id] = exifData;
+            _urlToIptcData[id] = iptcData;
+        }
+
         if (callback) {
-            callback.call(img);
+            callback.call(exifData, iptcData);
         }
     }
 
@@ -729,7 +737,10 @@ function getData(img, callback) {
         getImageData(img, callback);
     } else {
         if (callback) {
-            callback.call(img);
+            callback.call(
+                _urlToExifData[img.src],
+                _urlToIptcData[img.src]
+            );
         }
     }
     return true;
@@ -737,13 +748,13 @@ function getData(img, callback) {
 
 function getTag(img, tag) {
     if (!imageHasData(img)) return;
-    return img.exifdata[tag];
+    return _urlToExifData[img.src][tag];
 }
 
 function getAllTags(img) {
     if (!imageHasData(img)) return {};
-    var a, 
-        data = img.exifdata,
+    var a,
+        data = _urlToExifData[img.src],
         tags = {};
     for (a in data) {
         if (data.hasOwnProperty(a)) {
@@ -756,7 +767,7 @@ function getAllTags(img) {
 function pretty(img) {
     if (!imageHasData(img)) return "";
     var a,
-        data = img.exifdata,
+        data = _urlToExifData[img.src],
         strPretty = "";
     for (a in data) {
         if (data.hasOwnProperty(a)) {
@@ -778,6 +789,9 @@ function readFromBinaryFile(file) {
     return findEXIFinJPEG(file);
 }
 
+if (!window.module) {
+  module = {};
+}
 module.exports = {
     readFromBinaryFile : readFromBinaryFile,
     pretty : pretty,
